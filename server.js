@@ -1,42 +1,21 @@
-const http = require("http");
-const { Client } = require("pg");
+const express = require("express");
+require("dotenv").config();
+const connectDB = require("./config/db");
 
-const client = new Client({
-  host: "db",
-  user: "user",
-  password: "password",
-  database: "mydb",
-  port: 5432,
+connectDB();
+
+const app = express();
+
+const userRoutes = require("./routes/users");
+
+app.use(express.json());
+
+app.get("/", (req, res) => {
+  res.send("jag lär mig backend nu ~@");
 });
 
-async function startServer() {
-  let connected = false;
+app.use("/users", userRoutes);
 
-  while (!connected) {
-    try {
-      await client.connect();
-      console.log("Connected to DB");
-      connected = true;
-    } catch (err) {
-      console.log("Waiting for DB...");
-      await new Promise(res => setTimeout(res, 3000));
-    }
-  }
-
-  const server = http.createServer(async (req, res) => {
-    if (req.url === "/api") {
-      const result = await client.query("SELECT NOW()");
-      res.writeHead(200, { "Content-Type": "application/json" });
-      res.end(JSON.stringify(result.rows[0]));
-    } else {
-      res.writeHead(404);
-      res.end("Not found");
-    }
-  });
-
-  server.listen(3000, () => {
-    console.log("Server running on port 3000");
-  });
-}
-
-startServer();
+app.listen(3000, () => {
+  console.log("Server running on port 3000");
+});
