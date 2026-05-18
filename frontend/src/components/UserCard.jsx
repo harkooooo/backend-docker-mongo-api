@@ -1,6 +1,6 @@
 function UserCard({ u, user, onEdit, onDelete, onMakeAdmin, onRemoveAdmin }) {
   return (
-    <div>
+    <div className="user-card">
       <p>{u.name}</p>
       <p>{u.email}</p>
       <p>Role: {u.role}</p>
