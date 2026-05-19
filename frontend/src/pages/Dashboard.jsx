@@ -50,6 +50,8 @@ async function makeAdmin(id) {
   console.log("Make admin clicked:", id);
 
   try {
+    setMakingAdmin(true);
+
     const res = await api.patch(`/users/${id}`, {
       role: "admin",
     });
@@ -62,12 +64,14 @@ async function makeAdmin(id) {
       )
     );
 
-showMessage("User is now admin");
+    showMessage("User is now admin");
+    setMakingAdmin(false);
 
   } catch (error) {
+    setMakingAdmin(false);
     console.log(error.response?.data);
     showMessage("Could not make user admin");
-}
+  }
 }
 
   const token = localStorage.getItem("token");
@@ -320,28 +324,31 @@ Users (
     key={u._id}
     u={u}
     user={user}
+    makingAdmin={makingAdmin}
+    editingUserId={editingUserId}
+    editName={editName}
+    editAge={editAge}
+    saving={saving}
+
     onEdit={(u) => {
       setEditingUserId(u._id);
       setEditName(u.name);
       setEditAge(u.age);
     }}
+
     onDelete={deleteUser}
     onMakeAdmin={makeAdmin}
     onRemoveAdmin={removeAdmin}
+    onSave={updateUser}
 
-editingUserId={editingUserId}
-editName={editName}
-editAge={editAge}
-saving={saving}
-onSave={updateUser}
-onCancelEdit={() => {
-  setEditingUserId(null);
-  setEditName("");
-  setEditAge("");
-}}
-setEditName={setEditName}
-setEditAge={setEditAge}
+    onCancelEdit={() => {
+      setEditingUserId(null);
+      setEditName("");
+      setEditAge("");
+    }}
 
+    setEditName={setEditName}
+    setEditAge={setEditAge}
   />
 ))}
 

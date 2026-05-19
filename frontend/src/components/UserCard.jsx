@@ -1,6 +1,7 @@
 function UserCard({
   u,
   user,
+  makingAdmin,
   editingUserId,
   editName,
   editAge,
@@ -35,12 +36,14 @@ function UserCard({
             type="text"
             value={editName}
             onChange={(e) => setEditName(e.target.value)}
+            disabled={saving}
           />
 
           <input
             type="number"
             value={editAge}
             onChange={(e) => setEditAge(e.target.value)}
+            disabled={saving}
           />
 
           <button onClick={() => onSave(u._id)} disabled={saving}>
@@ -58,7 +61,12 @@ function UserCard({
       )}
 
       {u.role !== "admin" && (
-        <button onClick={() => onMakeAdmin(u._id)}>Make Admin</button>
+        <button
+  onClick={() => onMakeAdmin(u._id)}
+  disabled={makingAdmin}
+>
+  {makingAdmin ? "Making..." : "Make Admin"}
+</button>
       )}
 
       {u.role === "admin" && u._id !== user._id && (
