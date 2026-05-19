@@ -1,4 +1,19 @@
-function UserCard({ u, user, onEdit, onDelete, onMakeAdmin, onRemoveAdmin }) {
+function UserCard({
+  u,
+  user,
+  editingUserId,
+  editName,
+  editAge,
+  saving,
+  onEdit,
+  onDelete,
+  onMakeAdmin,
+  onRemoveAdmin,
+  onSave,
+  onCancelEdit,
+  setEditName,
+  setEditAge,
+}) {
   return (
     <div className="user-card">
       <p>{u.name}</p>
@@ -6,8 +21,34 @@ function UserCard({ u, user, onEdit, onDelete, onMakeAdmin, onRemoveAdmin }) {
       <p>Role: {u.role}</p>
       <p>Age: {u.age}</p>
 
+      {u.createdAt && (
+        <p>Joined: {new Date(u.createdAt).toLocaleDateString()}</p>
+      )}
+
       {u._id !== user._id && (
         <button onClick={() => onEdit(u)}>Edit</button>
+      )}
+
+      {editingUserId === u._id && (
+        <div>
+          <input
+            type="text"
+            value={editName}
+            onChange={(e) => setEditName(e.target.value)}
+          />
+
+          <input
+            type="number"
+            value={editAge}
+            onChange={(e) => setEditAge(e.target.value)}
+          />
+
+          <button onClick={() => onSave(u._id)} disabled={saving}>
+            {saving ? "Saving..." : "Save"}
+          </button>
+
+          <button onClick={onCancelEdit}>Cancel</button>
+        </div>
       )}
 
       {u._id === user._id && <p>(You)</p>}
@@ -23,8 +64,6 @@ function UserCard({ u, user, onEdit, onDelete, onMakeAdmin, onRemoveAdmin }) {
       {u.role === "admin" && u._id !== user._id && (
         <button onClick={() => onRemoveAdmin(u._id)}>Remove Admin</button>
       )}
-
-      <hr />
     </div>
   );
 }

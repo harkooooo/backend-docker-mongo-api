@@ -168,7 +168,18 @@ async function updateUser(id) {
   return (
     <div>
       <h1>Dashboard</h1>
-      {message && <p>{message}</p>}
+      {message && (
+  <p
+    className={
+  message.toLowerCase().includes("could") ||
+  message.toLowerCase().includes("wrong")
+    ? "message-error"
+    : "message-success"
+}
+  >
+    {message}
+  </p>
+)}
 
       <p>Du är inloggad.</p>
 
@@ -246,11 +257,22 @@ Users (
   <option value="oldest">Oldest</option>
 </select>
 
-<p>
-Admins: {users.filter(u => u.role === "admin").length}
- | Users: {users.filter(u => u.role === "user").length}
- | Total: {users.length}
-</p>
+<div className="stats">
+  <div className="stat-card">
+    <h3>Admins</h3>
+    <p>{users.filter(u => u.role === "admin").length}</p>
+  </div>
+
+  <div className="stat-card">
+    <h3>Users</h3>
+    <p>{users.filter(u => u.role === "user").length}</p>
+  </div>
+
+  <div className="stat-card">
+    <h3>Total</h3>
+    <p>{users.length}</p>
+  </div>
+</div>
 
 {users.filter((u) =>
   u.name.toLowerCase().includes(search.toLowerCase())
@@ -306,6 +328,20 @@ Admins: {users.filter(u => u.role === "admin").length}
     onDelete={deleteUser}
     onMakeAdmin={makeAdmin}
     onRemoveAdmin={removeAdmin}
+
+editingUserId={editingUserId}
+editName={editName}
+editAge={editAge}
+saving={saving}
+onSave={updateUser}
+onCancelEdit={() => {
+  setEditingUserId(null);
+  setEditName("");
+  setEditAge("");
+}}
+setEditName={setEditName}
+setEditAge={setEditAge}
+
   />
 ))}
 
