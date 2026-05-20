@@ -241,7 +241,7 @@ setPages(usersRes.data.pages);
   };
 
   return (
-    <div>
+<div className="dashboard-container">
       <h1>Dashboard</h1>
       {message && (
   <p
@@ -279,8 +279,10 @@ setPages(usersRes.data.pages);
        onChange={(e) => setSearch(e.target.value)}
      />
 
-<form onSubmit={createUser}>
-  <h3>Create User</h3>
+<h3>Create User</h3>
+
+<form onSubmit={createUser} className="create-user">
+
 
   <input
     type="text"
@@ -320,7 +322,7 @@ setPages(usersRes.data.pages);
 </form>
 
       {user?.role === "admin" && (
-  <div>
+   <div className="admin-panel">
     <h2>Admin Panel</h2>
     <p>Du är admin.</p>
   </div>
@@ -345,14 +347,15 @@ setPages(usersRes.data.pages);
   <option value={20}>20</option>
 </select>
 
-<span> users per page</span>
+<span>users per page</span>
 
-  <h2>
+<div className="users-section">
+
+<h2>
 Users (
 {
-
-  users.filter((u) =>
-  (u.name || "").toLowerCase().includes(search.toLowerCase())
+  users.filter((u)=>
+    (u.name || "").toLowerCase().includes(search.toLowerCase())
   ).length
 }
 )
@@ -464,6 +467,8 @@ Users (
     setEditAge={setEditAge}
   />
 ))}
+
+</div>
 
 <button
   onClick={() => setPage(page - 1)}
