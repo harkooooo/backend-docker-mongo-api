@@ -12,6 +12,11 @@ const [editAge, setEditAge] = useState("");
 const [loading, setLoading] = useState(true);
 const [message, setMessage] = useState("");
 const [saving, setSaving] = useState(false);
+const [newName, setNewName] = useState("");
+const [newEmail, setNewEmail] = useState("");
+const [newAge, setNewAge] = useState("");
+const [newPassword, setNewPassword] = useState("");
+const [creatingUser, setCreatingUser] = useState(false);
 const [makingAdmin, setMakingAdmin] = useState(false);
 const [page, setPage] = useState(1);
 const [pages, setPages] = useState(1);
@@ -135,8 +140,19 @@ try {
 }
 
 async function updateUser(id) {
+  if (editName.trim() === "") {
+    showMessage("Name cannot be empty");
+    return;
+  }
+
+  if (Number(editAge) <= 0) {
+    showMessage("Age must be positive");
+    return;
+  }
+
   try {
     setSaving(true);
+
     const res = await api.patch(`/users/${id}`, {
       name: editName,
       age: editAge,
@@ -163,6 +179,61 @@ async function updateUser(id) {
   }
 }
 
+async function createUser(e) {
+  e.preventDefault();
+
+  if (newName.trim() === "") {
+    showMessage("Name cannot be empty");
+    return;
+  }
+
+  if (newEmail.trim() === "") {
+    showMessage("Email cannot be empty");
+    return;
+  }
+
+  if (Number(newAge) <= 0) {
+    showMessage("Age must be positive");
+    return;
+  }
+
+  if (newPassword.length < 6) {
+    showMessage("Password must be at least 6 characters");
+    return;
+  }
+
+  try {
+    setCreatingUser(true);
+
+    const res = await api.post("/auth/register", {
+      name: newName,
+      email: newEmail,
+      age: newAge,
+      password: newPassword,
+    });
+
+console.log("Created user response:", res.data);
+
+    showMessage("User created successfully");
+
+const usersRes = await api.get(`/users?page=${page}&limit=${limit}`);
+setUsers(usersRes.data.data);
+setPages(usersRes.data.pages);
+
+    setNewName("");
+    setNewEmail("");
+    setNewAge("");
+    setNewPassword("");
+
+    showMessage("User created successfully");
+    setCreatingUser(false);
+  } catch (error) {
+    setCreatingUser(false);
+    console.log(error.response?.data);
+    showMessage("Could not create user");
+  }
+}
+
   const handleLogout = () => {
     localStorage.removeItem("token");
     window.location.href = "/";
@@ -174,9 +245,11 @@ async function updateUser(id) {
       <h1>Dashboard</h1>
       {message && (
   <p
-    className={
-  message.toLowerCase().includes("could") ||
-  message.toLowerCase().includes("wrong")
+  className={
+  message?.toLowerCase().includes("could") ||
+  message?.toLowerCase().includes("wrong") ||
+  message?.toLowerCase().includes("cannot") ||
+  message?.toLowerCase().includes("must")
     ? "message-error"
     : "message-success"
 }
@@ -205,6 +278,46 @@ async function updateUser(id) {
        value={search}
        onChange={(e) => setSearch(e.target.value)}
      />
+
+<form onSubmit={createUser}>
+  <h3>Create User</h3>
+
+  <input
+    type="text"
+    placeholder="Name"
+    value={newName}
+    onChange={(e) => setNewName(e.target.value)}
+    disabled={creatingUser}
+  />
+
+  <input
+    type="email"
+    placeholder="Email"
+    value={newEmail}
+    onChange={(e) => setNewEmail(e.target.value)}
+    disabled={creatingUser}
+  />
+
+  <input
+    type="number"
+    placeholder="Age"
+    value={newAge}
+    onChange={(e) => setNewAge(e.target.value)}
+    disabled={creatingUser}
+  />
+
+  <input
+    type="password"
+    placeholder="Password"
+    value={newPassword}
+    onChange={(e) => setNewPassword(e.target.value)}
+    disabled={creatingUser}
+  />
+
+  <button disabled={creatingUser}>
+    {creatingUser ? "Creating..." : "Create User"}
+  </button>
+</form>
 
       {user?.role === "admin" && (
   <div>
@@ -239,7 +352,7 @@ Users (
 {
 
   users.filter((u) =>
-    u.name.toLowerCase().includes(search.toLowerCase())
+  (u.name || "").toLowerCase().includes(search.toLowerCase())
   ).length
 }
 )
@@ -279,14 +392,14 @@ Users (
 </div>
 
 {users.filter((u) =>
-  u.name.toLowerCase().includes(search.toLowerCase())
+  (u.name || "").toLowerCase().includes(search.toLowerCase())
 ).length === 0 && (
   <p>No users found</p>
 )}
 
     {users
   .filter((u) =>
-    u.name.toLowerCase().includes(search.toLowerCase())
+  (u.name || "").toLowerCase().includes(search.toLowerCase())
   )  
   .sort((a, b) => {
   if (a.role === "admin" && b.role !== "admin") return -1;
