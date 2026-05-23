@@ -1,6 +1,7 @@
 import UserCard from "../components/UserCard";
 import { useState, useEffect } from "react";
 import api from "../api/axios";
+import toast, { Toaster } from "react-hot-toast";
 
 function Dashboard() {
   const [user, setUser] = useState(null);
@@ -10,26 +11,20 @@ function Dashboard() {
 const [editName, setEditName] = useState("");
 const [editAge, setEditAge] = useState("");
 const [loading, setLoading] = useState(true);
-const [message, setMessage] = useState("");
 const [saving, setSaving] = useState(false);
+const [deletingUser, setDeletingUser] = useState(null);
 const [newName, setNewName] = useState("");
 const [newEmail, setNewEmail] = useState("");
 const [newAge, setNewAge] = useState("");
 const [newPassword, setNewPassword] = useState("");
 const [creatingUser, setCreatingUser] = useState(false);
-const [makingAdmin, setMakingAdmin] = useState(false);
-const [page, setPage] = useState(1);
+const [makingAdmin, setMakingAdmin] = useState(null);
+const [page, setPage] = useState(() => {
+  return Number(localStorage.getItem("page")) || 1;
+});
 const [pages, setPages] = useState(1);
 const [limit, setLimit] = useState(10);
 const [sortBy, setSortBy] = useState("name-asc");
-
-function showMessage(text) {
-  setMessage(text);
-
-  setTimeout(() => {
-    setMessage("");
-  }, 3000);
-}
 
   async function deleteUser(id) {
   const confirmDelete = window.confirm(
@@ -40,14 +35,18 @@ function showMessage(text) {
     return;
   }
 
+  setDeletingUser(id);
+
   try {
     await api.delete(`/users/${id}`);
 
     setUsers(users.filter((u) => u._id !== id));
-   showMessage("User deleted successfully");
+    toast.success("User deleted successfully");
+    setDeletingUser(null);
   } catch (error) {
+    setDeletingUser(null);
     console.log(error.response?.data);
-    showMessage("Could not delete user");
+    toast.error("Could not delete user");
   }
 }
 
@@ -55,7 +54,7 @@ async function makeAdmin(id) {
   console.log("Make admin clicked:", id);
 
   try {
-    setMakingAdmin(true);
+    setMakingAdmin(id);
 
     const res = await api.patch(`/users/${id}`, {
       role: "admin",
@@ -69,13 +68,13 @@ async function makeAdmin(id) {
       )
     );
 
-    showMessage("User is now admin");
-    setMakingAdmin(false);
+    toast.success("User is now admin");
+    setMakingAdmin(null);
 
   } catch (error) {
-    setMakingAdmin(false);
+    setMakingAdmin(null);
     console.log(error.response?.data);
-    showMessage("Could not make user admin");
+    toast.error("Could not make user admin");
   }
 }
 
@@ -102,6 +101,10 @@ async function makeAdmin(id) {
 
     fetchMe();
   }, [page, limit]);
+
+  useEffect(() => {
+  localStorage.setItem("page", page);
+}, [page]);
 
 if (loading) {
   return <p>Loading...</p>;
@@ -131,22 +134,22 @@ try {
     )
   );
 
-  showMessage("Admin removed successfully");
+  toast.success("Admin removed successfully");
 
 } catch (error) {
   console.log(error.response?.data);
-  showMessage("Could not remove admin");
+  toast.error("Could not remove admin");
 }
 }
 
 async function updateUser(id) {
   if (editName.trim() === "") {
-    showMessage("Name cannot be empty");
+    toast.error("Name cannot be empty");
     return;
   }
 
   if (Number(editAge) <= 0) {
-    showMessage("Age must be positive");
+    toast.error("Age must be positive");
     return;
   }
 
@@ -167,14 +170,14 @@ async function updateUser(id) {
     );
     setSaving(false);
     setEditingUserId(null);
-    showMessage("User updated successfully");
+    toast.success("User updated successfully");
 
 
   } catch (error) {
     setSaving(false);
 
     console.log(error.response?.data);
-    setMessage("Something went wrong");
+    toast.error("Something went wrong");
 
   }
 }
@@ -183,22 +186,22 @@ async function createUser(e) {
   e.preventDefault();
 
   if (newName.trim() === "") {
-    showMessage("Name cannot be empty");
+    toast.error("Name cannot be empty");
     return;
   }
 
   if (newEmail.trim() === "") {
-    showMessage("Email cannot be empty");
+    toast.error("Email cannot be empty");
     return;
   }
 
   if (Number(newAge) <= 0) {
-    showMessage("Age must be positive");
+    toast.error("Age must be positive");
     return;
   }
 
   if (newPassword.length < 6) {
-    showMessage("Password must be at least 6 characters");
+    toast.error("Password must be at least 6 characters");
     return;
   }
 
@@ -214,8 +217,6 @@ async function createUser(e) {
 
 console.log("Created user response:", res.data);
 
-    showMessage("User created successfully");
-
 const usersRes = await api.get(`/users?page=${page}&limit=${limit}`);
 setUsers(usersRes.data.data);
 setPages(usersRes.data.pages);
@@ -225,12 +226,12 @@ setPages(usersRes.data.pages);
     setNewAge("");
     setNewPassword("");
 
-    showMessage("User created successfully");
+    toast.success("User created successfully");
     setCreatingUser(false);
   } catch (error) {
     setCreatingUser(false);
     console.log(error.response?.data);
-    showMessage("Could not create user");
+    toast.error("Could not create user");
   }
 }
 
@@ -242,33 +243,27 @@ setPages(usersRes.data.pages);
 
   return (
 <div className="dashboard-container">
+<Toaster />
       <h1>Dashboard</h1>
-      {message && (
-  <p
-  className={
-  message?.toLowerCase().includes("could") ||
-  message?.toLowerCase().includes("wrong") ||
-  message?.toLowerCase().includes("cannot") ||
-  message?.toLowerCase().includes("must")
-    ? "message-error"
-    : "message-success"
-}
-  >
-    {message}
-  </p>
-)}
+      <h2>Welcome back, {user?.name} 👋</h2>
 
-      <p>Du är inloggad.</p>
-
+<p>
+Logged in as <strong>{user?.role}</strong>
+</p>
 
       {user && (
         <div>
-          <p>Namn: {user.name}</p>
-          <p>Email: {user.email}</p>
-          <p>Roll: {user.role}</p>
+          <div className="profile-card">
+
+<p>Name: {user?.name}</p>
+<p>Email: {user?.email}</p>
+<p>Role: {user?.role}</p>
+
 <button onClick={handleLogout}>
-  Logout
+Logout
 </button>
+
+</div>
         </div>
       )}
 
@@ -349,8 +344,6 @@ setPages(usersRes.data.pages);
 
 <span>users per page</span>
 
-<div className="users-section">
-
 <h2>
 Users (
 {
@@ -361,21 +354,23 @@ Users (
 )
 </h2>
 
-<label>
-  Sort by:
-</label>
+<div className="sort-row">
+  <label>
+    Sort by:
+  </label>
 
-<select
-  value={sortBy}
-  onChange={(e) => setSortBy(e.target.value)}
->
-  <option value="name-asc">Name A-Z</option>
-  <option value="name-desc">Name Z-A</option>
-  <option value="age-desc">Age high-low</option>
-  <option value="age-asc">Age low-high</option>
-  <option value="newest">Newest</option>
-  <option value="oldest">Oldest</option>
-</select>
+  <select
+    value={sortBy}
+    onChange={(e) => setSortBy(e.target.value)}
+  >
+    <option value="name-asc">Name A-Z</option>
+    <option value="name-desc">Name Z-A</option>
+    <option value="age-desc">Age high-low</option>
+    <option value="age-asc">Age low-high</option>
+    <option value="newest">Newest</option>
+    <option value="oldest">Oldest</option>
+  </select>
+</div>
 
 <div className="stats">
   <div className="stat-card">
@@ -399,6 +394,8 @@ Users (
 ).length === 0 && (
   <p>No users found</p>
 )}
+
+<div className="users-section">
 
     {users
   .filter((u) =>
@@ -445,6 +442,7 @@ Users (
     editName={editName}
     editAge={editAge}
     saving={saving}
+    deletingUser={deletingUser}
 
     onEdit={(u) => {
       setEditingUserId(u._id);

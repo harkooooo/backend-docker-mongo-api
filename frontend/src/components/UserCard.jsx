@@ -2,6 +2,7 @@ function UserCard({
   u,
   user,
   makingAdmin,
+  deletingUser,
   editingUserId,
   editName,
   editAge,
@@ -57,15 +58,20 @@ function UserCard({
       {u._id === user._id && <p>(You)</p>}
 
       {u._id !== user._id && (
-        <button onClick={() => onDelete(u._id)}>Delete</button>
-      )}
+        <button
+    onClick={() => onDelete(u._id)}
+    disabled={deletingUser === u._id}
+  >
+    {deletingUser === u._id ? "Deleting..." : "Delete"}
+  </button>
+)}
 
       {u.role !== "admin" && (
         <button
   onClick={() => onMakeAdmin(u._id)}
-  disabled={makingAdmin}
+  disabled={makingAdmin === u._id}
 >
-  {makingAdmin ? "Making..." : "Make Admin"}
+  {makingAdmin === u._id ? "Making..." : "Make Admin"}
 </button>
       )}
 

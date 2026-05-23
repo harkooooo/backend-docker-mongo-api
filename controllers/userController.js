@@ -109,6 +109,10 @@ if (
       }
     });
 
+if (req.body.role && req.user.role !== "admin") {
+  return res.status(403).json({ message: "Only admins can change roles" });
+}
+
     const user = await User.findByIdAndUpdate(
       req.params.id,
       updates,
@@ -153,6 +157,13 @@ if (
 ) {
   return res.status(403).json({
     message: "Not allowed"
+  });
+}
+const user = await User.findByIdAndDelete(req.params.id);
+
+if (!user) {
+  return res.status(404).json({
+    message: "User not found"
   });
 }
 
