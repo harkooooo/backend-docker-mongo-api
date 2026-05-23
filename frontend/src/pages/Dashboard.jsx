@@ -19,6 +19,7 @@ const [newAge, setNewAge] = useState("");
 const [newPassword, setNewPassword] = useState("");
 const [creatingUser, setCreatingUser] = useState(false);
 const [makingAdmin, setMakingAdmin] = useState(null);
+const [removingAdmin, setRemovingAdmin] = useState(null);
 const [page, setPage] = useState(() => {
   return Number(localStorage.getItem("page")) || 1;
 });
@@ -124,6 +125,7 @@ if (!confirmRemove) {
   return;
 }
 try {
+  setRemovingAdmin(id);
   const res = await api.patch(`/users/${id}`, {
     role: "user",
   });
@@ -135,8 +137,10 @@ try {
   );
 
   toast.success("Admin removed successfully");
+  setRemovingAdmin(null);
 
 } catch (error) {
+  setRemovingAdmin(null);
   console.log(error.response?.data);
   toast.error("Could not remove admin");
 }
@@ -437,6 +441,7 @@ Users (
     key={u._id}
     u={u}
     user={user}
+    removingAdmin={removingAdmin}
     makingAdmin={makingAdmin}
     editingUserId={editingUserId}
     editName={editName}

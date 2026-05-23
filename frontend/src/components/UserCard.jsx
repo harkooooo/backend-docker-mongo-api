@@ -2,6 +2,7 @@ function UserCard({
   u,
   user,
   makingAdmin,
+  removingAdmin,
   deletingUser,
   editingUserId,
   editName,
@@ -76,7 +77,14 @@ function UserCard({
       )}
 
       {u.role === "admin" && u._id !== user._id && (
-        <button onClick={() => onRemoveAdmin(u._id)}>Remove Admin</button>
+        <button
+  onClick={() => onRemoveAdmin(u._id)}
+  disabled={removingAdmin === u._id}
+>
+  {removingAdmin === u._id
+    ? "Removing..."
+    : "Remove Admin"}
+</button>
       )}
     </div>
   );
