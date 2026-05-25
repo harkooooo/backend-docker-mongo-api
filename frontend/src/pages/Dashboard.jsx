@@ -410,11 +410,11 @@ Users (
   if (a.role !== "admin" && b.role === "admin") return 1;
 
   if (sortBy === "name-asc") {
-    return a.name.localeCompare(b.name);
+    return (a.name || "").localeCompare(b.name || "");
   }
 
   if (sortBy === "name-desc") {
-    return b.name.localeCompare(a.name);
+    return (b.name || "").localeCompare(a.name || "");
   }
 
   if (sortBy === "age-asc") {
