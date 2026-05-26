@@ -1,1 +1,69 @@
-# Backend API with DockerThis is a backend API built with Node.js, Express, MongoDB, and Docker.## Features- CRUD operations for users- MongoDB database- Dockerized application## Tech Stack- Node.js- Express- MongoDB- Docker## Run locally### With Docker```bashdocker compose up --build
+# Backend API with Docker
+
+A full-stack MERN admin dashboard with authentication, CRUD operations,
+admin roles, pagination, search, user editing and Docker deployment.
+
+## Live Demo
+
+Frontend:  
+https://DIN-FRONTEND-LÄNK.vercel.app
+
+Backend:  
+https://DIN-BACKEND-LÄNK.vercel.app
+
+
+## Features
+
+- Authentication (JWT)
+- Register / Login
+- User CRUD
+- Edit users
+- Delete users
+- Promote users to admin
+- Remove admin role
+- Search users
+- Pagination
+- Joined date
+- Updated date
+- Loading states
+- MongoDB database
+- Dockerized backend
+- Responsive UI
+
+
+## Tech Stack
+
+- React
+- Node.js
+- Express
+- MongoDB
+- Docker
+- JWT
+- bcrypt
+- Vercel
+
+
+## Run locally
+
+### With Docker
+
+```bash
+docker compose up --build
+```
+
+### Without Docker
+
+```bash
+npm install
+npm start
+```
+
+
+## Screenshots
+
+(Add screenshots here)
+
+
+## Author
+
+Built by Haris 🚀
