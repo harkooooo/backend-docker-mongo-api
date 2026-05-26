@@ -24,15 +24,17 @@ function UserCard({
       <p>Role: {u.role}</p>
       <p>Age: {u.age}</p>
 
-      {u.createdAt && (
-        <p>Joined: {new Date(u.createdAt).toLocaleDateString()}</p>
-      )}
-
-      {u.updatedAt &&
- u.updatedAt !== u.createdAt && (
+      {(u.createdAt || u.updatedAt) && (
   <p>
-    Updated: {new Date(u.updatedAt).toLocaleDateString()}
+    Joined:{" "}
+    {u.createdAt
+      ? new Date(u.createdAt).toLocaleDateString()
+      : new Date(u.updatedAt).toLocaleDateString()}
   </p>
+)}
+
+{u.createdAt && u.updatedAt && u.updatedAt !== u.createdAt && (
+  <p>Updated: {new Date(u.updatedAt).toLocaleDateString()}</p>
 )}
 
       {u._id !== user._id && (
