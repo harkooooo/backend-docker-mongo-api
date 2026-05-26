@@ -6,7 +6,7 @@ admin roles, pagination, search, user editing and Docker deployment.
 ## Live Demo
 
 Frontend:
-https://mern-admin-dashboard.vercel.app
+https://mern-admin-dashboard-dcmnqrmvz-harko-s-projects.vercel.app
 
 Backend:
 https://backend-docker-mongo-api.vercel.app
