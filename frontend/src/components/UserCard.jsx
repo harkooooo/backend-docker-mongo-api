@@ -28,6 +28,13 @@ function UserCard({
         <p>Joined: {new Date(u.createdAt).toLocaleDateString()}</p>
       )}
 
+      {u.updatedAt &&
+ u.updatedAt !== u.createdAt && (
+  <p>
+    Updated: {new Date(u.updatedAt).toLocaleDateString()}
+  </p>
+)}
+
       {u._id !== user._id && (
         <button onClick={() => onEdit(u)}>Edit</button>
       )}
@@ -52,7 +59,9 @@ function UserCard({
             {saving ? "Saving..." : "Save"}
           </button>
 
-          <button onClick={onCancelEdit}>Cancel</button>
+          <button onClick={onCancelEdit} disabled={saving}>
+         Cancel
+       </button>
         </div>
       )}
 
@@ -67,7 +76,7 @@ function UserCard({
   </button>
 )}
 
-      {u.role !== "admin" && (
+      {u.role !== "admin" && u._id !== user._id && (
         <button
   onClick={() => onMakeAdmin(u._id)}
   disabled={makingAdmin === u._id}
